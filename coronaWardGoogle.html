@@ -41,6 +41,7 @@
   <body>
     <div id="map"></div>
     <script>
+      //import { positionsCorona } from "coronaData.js"
 
       // This example displays a marker at the center of Australia.
       // When the user clicks the marker, an info window opens.
@@ -52,44 +53,60 @@
           center: uluru
         });
 
-        var userStatus = {good: ['안전', '아무도 다녀가지 않았어요 !'], soso: ['주의', '확진자 분이 다녀간 길이에요 !'], bad: ['경계', '오늘에서 그저께 사이에 확진자 분이 다녀갔답니다!']};
+        var userStatus = {good: ['안전', '아무도 다녀가지 않았어요 !'],  bad: ['경계', '확진자 분이 다녀간 길입니다!']};
         var coronaStatus = ['병원에서 치료 중', '자가 격리 중', '사망'];
-        var circleRadius = 20;
-
-        
+        var circleRadius = 1;
+        var userDistance = 0.1;
 
         var positions = [
-			{
-				title: '나의 위치',
-				latlng: {lat: 37.56682, lng:126.97865}
-			},
-			{
-				title: '1번째 환자', 
-				latlng: {lat: 37.56880, lng: 126.97860}
-			},
-			{
-				title: '2번째 환자', 
-				latlng: {lat: 37.56836, lng: 126.97477}
-			},
-			{
-				title: '3번째 환자', 
-				latlng: {lat: 37.56879, lng: 126.97940}
-			},
-			{
-				title: '4번째 환자',
-				latlng: {lat: 37.56893, lng: 126.97738}
-			}
-		];
+          {
+            title: '나의 위치',
+            latlng: {lat: 37.56682, lng:126.97865}
+          },
+          {
+            title: '1번째 환자', 
+            latlng: {lat: 37.56880, lng: 126.97860}
+          },
+          {
+            title: '2번째 환자', 
+            latlng: {lat: 37.56836, lng: 126.97477}
+          },
+          {
+            title: '3번째 환자', 
+            latlng: {lat: 37.56879, lng: 126.97940}
+          },
+          {
+            title: '4번째 환자',
+            latlng: {lat: 37.56893, lng: 126.97738}
+          }
+        ];
 
-        contentUser = createContent(positions[0].latlng);
-        
+        var contentUser;
+        var currentUserStatus;
+
+        //User와 Corona 확진자와의 거리 계산 후 판정
+        for(var i = 1; i < positions.length; i ++){
+          if (coronaCalculator(positions[i].latlng.lat, positions[i].latlng.lng, positions[0].latlng.lat, positions[0].latlng.lng, circleRadius) == true){
+            currentUserStatus = userStatus.bad;
+            break;
+          }
+          else if(i==positions.length-1){
+            currentUserStatus = userStatus.good;
+          }
+        }
+
+        //InfoWindow Content 설정
+        contentUser = createContent(currentUserStatus)
+
+        //InfoWindow 생성 및 표시
         var infowindow = new google.maps.InfoWindow({
           content: contentUser
         });        
 
         var imageCorona = "https://user-images.githubusercontent.com/56578913/75643096-318bbf00-5c81-11ea-868f-687ba0983415.png",
-		imageUser = "https://user-images.githubusercontent.com/56578913/75643291-e2925980-5c81-11ea-9ff1-abad584df634.png"
+		    imageUser = "https://user-images.githubusercontent.com/56578913/75643291-e2925980-5c81-11ea-9ff1-abad584df634.png"
 
+        //Marker 생성 및 표시
         for(var i = 0; i < positions.length; i++){
             var position = positions[i].latlng,
             title = positions[i].title,
@@ -109,29 +126,45 @@
             });
         }
 
-        function createContent(userPosition){
-            var statusList = userStatus.good;
-            for(var i = 0; positions[1]  <= i < positions.length; i++){
-                if (Math.pow(userPosition.lat-positions[i].latlng.lat,2)+Math.pow(userPosition.lng-positions[i].latlng.lng,2) <= circleRadius){
-                    break;
-                    //수정
-                    statusList = userStatus.bad
-                }
-            }
+        function coronaCalculator(latCorona, lngCorona, latUser, lngUser, circleRadius){
+          var distance;
+          var radius = 6371; // 지구 반지름(km)
+          var toRadian = Math.PI / 180;
 
-            var content1 = '<div class="overlay_info2">';
-			content1 += '    <a href="https://place.map.kakao.com/17600274" target="_blank"><strong>'
-            content1 += '나의 현재 위치 : ' + statusList[0]
-            content1 += '</strong></a>';
-			content1 += '    <div class="desc">';
-			content1 += '        <img src="https://user-images.githubusercontent.com/56578913/75620968-09915280-5bd2-11ea-9351-221214a819a5.png" width="60px" height="60px" alt="">';
-			content1 += '        <span class="address">'
-            content1 += statusList[1]
-            content1 += '</span>';
-			content1 += '    </div>';
-			content1 += '</div>';
+          var deltaLatitude = Math.abs(latCorona - latUser) * toRadian;
+          var deltaLongitude = Math.abs(lngCorona - lngUser) * toRadian;
 
-            return content1
+          var sinDeltaLat = Math.sin(deltaLatitude / 2);
+          var sinDeltaLng = Math.sin(deltaLongitude / 2);
+          var squareRoot = Math.sqrt(
+              sinDeltaLat * sinDeltaLat +
+              Math.cos(latCorona * toRadian) * Math.cos(latUser * toRadian) * sinDeltaLng * sinDeltaLng);
+
+          distance = 2 * radius * Math.asin(squareRoot);
+
+          console.log('거리 : ')
+          console.log(distance);
+          
+          if (distance <= userDistance){
+              return true;
+          }
+          return false;
+        }
+
+        function createContent(statusList){
+          var content1 = '<div class="overlay_info2">';
+			    content1 += '    <a href="https://place.map.kakao.com/17600274" target="_blank"><strong>'
+          content1 += '나의 현재 위치 : ' + statusList[0]
+          content1 += '</strong></a>';
+          content1 += '    <div class="desc">';
+          content1 += '        <img src="https://user-images.githubusercontent.com/56578913/75620968-09915280-5bd2-11ea-9351-221214a819a5.png" width="60px" height="60px" alt="">';
+          content1 += '        <span class="address">'
+          content1 += statusList[1]
+          content1 += '</span>';
+			    content1 += '    </div>';
+			    content1 += '</div>';
+
+            return content1;
         }
 
       }
