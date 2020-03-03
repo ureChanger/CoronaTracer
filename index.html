@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>코로나 트레이서</title>
+    <meta property="og:title" content="코로나 트레이서"/>
+	<meta property="og:type"  content="website"/>
+	<meta property="og:image" content="https://user-images.githubusercontent.com/56578913/75622338-55e48e80-5be2-11ea-9380-1cfc0dfa720a.png" />
+	<meta property="og:description" content="확진자의 동선을 확인하는 가장 쉬운 방법"/>
+	<meta property="og:url" content="https://coronaward.neocities.org"/>
+	<link rel = "icon" href = "https://user-images.githubusercontent.com/56578913/75621888-97bf0600-5bdd-11ea-8022-0da3bb413497.png"
+		type = "image/x-icon"/>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <style>
+            .gm-ui-hover-effect {
+                display: none !important;
+            }
+            .overlay_info2 {border-radius: 6px; margin-bottom: 12px; float:left;position: relative; border: 1px solid #ccc; border-bottom: 2px solid #ddd;background-color:#fff;}
+            .overlay_info2:nth-of-type(n) {border:0; box-shadow: 0px 1px 2px #888;}
+            .overlay_info2 a {display: block; background: #32CD32; background: #32CD32 url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/arrow_white.png) no-repeat right 14px center; text-decoration: none; color: #fff; padding:12px 36px 12px 14px; font-size: 14px; border-radius: 6px 6px 0 0}
+            .overlay_info2 a strong {background:url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/place_icon.png) no-repeat; padding-left: 27px;}
+            .overlay_info2 .desc {padding:14px;position: relative; min-width: 190px; height: 56px}
+            .overlay_info2 img {vertical-align: top;}
+            .overlay_info2 .address {font-size: 12px; color: #333; position: absolute; left: 80px; right: 14px; top: 24px; white-space: normal}
+            .overlay_info2:after {content:'';position: absolute; margin-left: -11px; left: 50%; bottom: -12px; width: 22px; height: 12px; background:url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png) no-repeat 0 bottom;}
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script type="module" src="./data/coronaData.js"></script>
+    <script type="module" src="./calculator.js"></script>
+    <script type="module" src="./infoWindow.js"></script>
+    <script type="text/javascript">
+        function initMap() {
+            import coronaCalculator from "./calculator";
+            import createContent from "./infoWindow";
+
+            var uluru = {lat: 37.56682, lng: 126.97865};
+            var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 18 ,
+            center: uluru
+            });
+
+            var userStatus = {good: ['안전', '아무도 다녀가지 않았어요 !'],  bad: ['경계', '확진자 분이 다녀간 길입니다!']};
+            var coronaStatus = ['병원에서 치료 중', '자가 격리 중', '사망'];
+            var circleRadius = 1;
+            var userDistance = 0.1;
+
+            var contentUser;
+            var currentUserStatus;
+
+            //User와 Corona 확진자와의 거리 계산 후 판정
+            for(var i = 1; i < positions.length; i ++){
+            if (coronaCalculator(positions[i].latlng.lat, positions[i].latlng.lng, positions[0].latlng.lat, positions[0].latlng.lng, circleRadius) <= userDistance){
+                currentUserStatus = userStatus.bad;
+                break;
+            }
+            else if(i==positions.length-1){
+                currentUserStatus = userStatus.good;
+            }
+            }
+
+
+            var imageCorona = "https://user-images.githubusercontent.com/56578913/75643096-318bbf00-5c81-11ea-868f-687ba0983415.png",
+                imageUser = "https://user-images.githubusercontent.com/56578913/75643291-e2925980-5c81-11ea-9ff1-abad584df634.png"
+
+            //Marker 생성 및 표시
+            for(var i = 0; i < positions.length; i++){
+                var position = positions[i].latlng,
+                title = positions[i].title,
+                icon = i == 0 ? imageCorona : imageUser
+                addMarker(position, title, icon)
+            }
+
+            function addMarker(position, title, icon){
+                var marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                title: title,
+                icon: icon
+                });
+
+                //InfoWindow Content 설정
+                contentUser = createContent(currentUserStatus)
+                
+                //InfoWindow 생성
+                var infowindow = new google.maps.InfoWindow({
+                    content: contentUser
+                });
+
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+            }
+
+        }
+  </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKq50sa8PzRLvZfUi3m4HYWJKX7AH7dS0&callback=initMap">
+    </script>
+  </body>
+</html>

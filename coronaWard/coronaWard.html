@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>코로나 와드</title>
+	<meta property="og:title" content="코로나 와드"/>
+	<meta property="og:type"  content="website"/>
+	<meta property="og:image" content="https://user-images.githubusercontent.com/56578913/75622338-55e48e80-5be2-11ea-9380-1cfc0dfa720a.png" />
+	<meta property="og:description" content="나의 안전을 확인하는 가장 쉬운 방법"/>
+	<meta property="og:url" content="https://coronaward.neocities.org"/>
+	<link rel = "icon" href = "https://user-images.githubusercontent.com/56578913/75621888-97bf0600-5bdd-11ea-8022-0da3bb413497.png"
+		type = "image/x-icon"/>
+	<style>
+		.overlay_info {border-radius: 6px; margin-bottom: 12px; float:left;position: relative; border: 1px solid #ccc; border-bottom: 2px solid #ddd;background-color:#fff;}
+		.overlay_info:nth-of-type(n) {border:0; box-shadow: 0px 1px 2px #888;}
+		.overlay_info a {display: block; background: #d95050; background: #d95050 url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/arrow_white.png) no-repeat right 14px center; text-decoration: none; color: #fff; padding:12px 36px 12px 14px; font-size: 14px; border-radius: 6px 6px 0 0}
+		.overlay_info a strong {background:url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/place_icon.png) no-repeat; padding-left: 27px;}
+		.overlay_info .desc {padding:14px;position: relative; min-width: 190px; height: 56px}
+		.overlay_info img {vertical-align: top;}
+		.overlay_info .address {font-size: 12px; color: #333; position: absolute; left: 80px; right: 14px; top: 24px; white-space: normal}
+		.overlay_info:after {content:'';position: absolute; margin-left: -11px; left: 50%; bottom: -12px; width: 22px; height: 12px; background:url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png) no-repeat 0 bottom;}
+	</style>
+	<style>
+		.overlay_info2 {border-radius: 6px; margin-bottom: 12px; float:left;position: relative; border: 1px solid #ccc; border-bottom: 2px solid #ddd;background-color:#fff;}
+		.overlay_info2:nth-of-type(n) {border:0; box-shadow: 0px 1px 2px #888;}
+		.overlay_info2 a {display: block; background: #32CD32; background: #32CD32 url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/arrow_white.png) no-repeat right 14px center; text-decoration: none; color: #fff; padding:12px 36px 12px 14px; font-size: 14px; border-radius: 6px 6px 0 0}
+		.overlay_info2 a strong {background:url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/place_icon.png) no-repeat; padding-left: 27px;}
+		.overlay_info2 .desc {padding:14px;position: relative; min-width: 190px; height: 56px}
+		.overlay_info2 img {vertical-align: top;}
+		.overlay_info2 .address {font-size: 12px; color: #333; position: absolute; left: 80px; right: 14px; top: 24px; white-space: normal}
+		.overlay_info2:after {content:'';position: absolute; margin-left: -11px; left: 50%; bottom: -12px; width: 22px; height: 12px; background:url(http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png) no-repeat 0 bottom;}
+	</style>
+</head>
+<body>
+	<div id="map" style="width:100%;height:100vh;"></div>
+
+	<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0d92a9e0ac9290b7e449f78869f7de44"></script>
+	<script>
+		var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+		    mapOption = {
+		        center: new kakao.maps.LatLng(37.56682, 126.97865), // 지도의 중심좌표
+		        level: 3, // 지도의 확대 레벨
+		        mapTypeId : kakao.maps.MapTypeId.ROADMAP // 지도종류
+		    }; 
+
+		// 지도를 생성한다 
+		var map = new kakao.maps.Map(mapContainer, mapOption); 
+
+		// 지도 타입 변경 컨트롤을 생성한다
+		var mapTypeControl = new kakao.maps.MapTypeControl();
+
+		// 지도의 상단 우측에 지도 타입 변경 컨트롤을 추가한다
+		map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);	
+
+		var positions = [
+			{
+				title: '나의 위치',
+				latlng: new kakao.maps.LatLng(37.56682, 126.97865)
+			},
+			{
+				title: '카카오', 
+				latlng: new kakao.maps.LatLng(37.56880, 126.97860)
+			},
+			{
+				title: '생태연못', 
+				latlng: new kakao.maps.LatLng(37.56836, 126.97477)
+			},
+			{
+				title: '텃밭', 
+				latlng: new kakao.maps.LatLng(37.56879, 126.97940)
+			},
+			{
+				title: '근린공원',
+				latlng: new kakao.maps.LatLng(37.56893, 126.97738)
+			}
+		];
+
+		// 마커 이미지의 이미지 주소입니다
+		var imageCorona = "https://user-images.githubusercontent.com/56578913/75643096-318bbf00-5c81-11ea-868f-687ba0983415.png",
+		imageUser = "https://user-images.githubusercontent.com/56578913/75643291-e2925980-5c81-11ea-9ff1-abad584df634.png",
+		selectedMarker = null;
+
+		for (var i = 0; i < positions.length; i ++) {
+			var imageSize = new kakao.maps.Size(42, 42); 
+			var imageSrc = i == 0 ? imageCorona : imageUser
+			addMarker(positions[i].title, positions[i].latlng, imageSrc, imageSize)
+		};
+
+		function addMarker(title, latlng, imageSrc, imageSize){
+			// 마커 이미지를 생성합니다  
+			var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize); 
+			
+			// 마커를 생성합니다
+			var marker = new kakao.maps.Marker({
+				map: map, // 마커를 표시할 지도
+				position: positions[i].latlng, // 마커를 표시할 위치
+				title : positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+				image : markerImage // 마커 이미지 
+			});
+
+			// User - 커스텀 오버레이 표출 내용
+			var content1 = '<div class="overlay_info2">';
+			content1 += '    <a href="https://place.map.kakao.com/17600274" target="_blank"><strong>나의 현재 위치 : 안전</strong></a>';
+			content1 += '    <div class="desc">';
+			content1 += '        <img src="https://user-images.githubusercontent.com/56578913/75620968-09915280-5bd2-11ea-9351-221214a819a5.png" width="60px" height="60px" alt="">';
+			content1 += '        <span class="address">마스크를 반드시 착용하고 다니세요 !</span>';
+			content1 += '    </div>';
+			content1 += '</div>';
+
+			mapCustomOverlay = createCustomOverlay(positions[0], content1)
+
+			// User - 커스텀 오버레이를 지도에 표시합니다
+			kakao.maps.event.addListener(marker, 'click', function(){
+				if(!selectedMarker || selectedMarker !== marker){
+					selectedMarker = marker
+					mapCustomOverlay.setMap(map);
+				}
+			})
+
+			function closeOverlay(){
+				mapCustomOverlay.setMap(null)
+			}
+
+			function createCustomOverlay(position, content){
+				var mapCustomOverlay = new kakao.maps.CustomOverlay({
+					position: position.latlng,
+					content: content,
+					xAnchor: 0.5,
+					yAnchor: 1.3
+				});
+
+				return mapCustomOverlay
+			}
+		}
+
+		// 지도에 원을 표시한다
+		var circle = new kakao.maps.Circle({
+			map: map, // 원을 표시할 지도 객체
+			center : new kakao.maps.LatLng(37.56682, 126.97865), // 지도의 중심 좌표
+			radius : 150, // 원의 반지름 (단위 : m)
+			fillColor: '#32CD32', // 채움 색
+			fillOpacity: 0.5, // 채움 불투명도
+			strokeWeight: 3, // 선의 두께
+			strokeColor: '#32CD32', // 선 색
+			strokeOpacity: 0.9, // 선 투명도 
+			strokeStyle: 'dash' // 선 스타일
+		});	
+
+        // 도형에 mouseover 이벤트를 등록한다 
+		kakao.maps.event.addListener(circle, 'mouseover', function() {
+			console.log('도형에 mouseover 이벤트가 발생했습니다!');
+		});
+
+		// 도형에 mouseout 이벤트를 등록한다 
+		kakao.maps.event.addListener(circle, 'mouseout', function() {
+			console.log('도형에 mouseout 이벤트가 발생했습니다!');
+		});
+
+		// 도형에 mousedown 이벤트를 등록한다
+		kakao.maps.event.addListener(circle, 'mousedown', function() {
+			console.log('도형에 mousedown 이벤트가 발생했습니다!');
+		});
+
+	</script>
+</body>
+</html>
