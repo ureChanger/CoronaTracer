@@ -18,5 +18,9 @@ export let positionsCorona = [
     {
       title: '4번째 환자',
       latlng: {lat: 37.56893, lng: 126.97738}
+    },
+    {
+      title: '5번째 환자',
+      latlng: {lat: 36.56893, lng: 126.97738}
     }
   ];
