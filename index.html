@@ -45,8 +45,8 @@
     <script type="module" src="./infoWindow.js"></script>
     <script type="text/javascript">
         function initMap() {
-            import coronaCalculator from "./calculator";
-            import createContent from "./infoWindow";
+            var coronaCalculator = require('./calculator');
+            var createContent = require( './infoWindow');
 
             var uluru = {lat: 37.56682, lng: 126.97865};
             var map = new google.maps.Map(document.getElementById('map'), {
