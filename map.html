@@ -1,0 +1,29 @@
+<html>
+<head>
+    <title> Vue.js Map direction finder</title>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        From: <input type="text" v-model="origin">
+        To: <input type="text" v-model="destination">
+        <iframe width="100%" height="500px" v-bind:src="src()"></iframe>
+    </div>
+</body>
+<script type="text/javascript">
+var vue_app = new Vue({
+    el: '#app',
+    data:{
+        origin: 'dubai',
+        destination: 'ajman',
+        url: "https://www.google.com/maps/embed/v1/directions?key=AIzaSyDKq50sa8PzRLvZfUi3m4HYWJKX7AH7dS0&callback"
+    },
+    methods:{
+        src:function(){
+            return this.url="&origin="+this.origin+"&destination"+this.destination;
+        }
+    }
+});
+    </script>
+</html>

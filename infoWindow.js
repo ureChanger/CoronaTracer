@@ -14,4 +14,4 @@ var createContent = function(statusList){
       return content1;
   }
 
-module.export = createContent;
+module.exports = createContent;

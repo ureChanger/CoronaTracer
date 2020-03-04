@@ -1,4 +1,4 @@
-function coronaCalculator(latCorona, lngCorona, latUser, lngUser, circleRadius){
+var coronaCalculator = function(latCorona, lngCorona, latUser, lngUser, circleRadius){
     var distance;
     var radius = 6371; // 지구 반지름(km)
     var toRadian = Math.PI / 180;
@@ -17,4 +17,4 @@ function coronaCalculator(latCorona, lngCorona, latUser, lngUser, circleRadius){
     return distance;
 }
 
-export default coronaCalculator;
+module.exports = coronaCalculator;
