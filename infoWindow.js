@@ -1,4 +1,4 @@
-var createContent = function(statusList){
+function createContent(statusList){
     var content1 = '<div class="overlay_info2">';
           content1 += '    <a href="https://place.map.kakao.com/17600274" target="_blank"><strong>'
     content1 += '나의 현재 위치 : ' + statusList[0]
@@ -13,5 +13,3 @@ var createContent = function(statusList){
 
       return content1;
   }
-
-module.exports = createContent;

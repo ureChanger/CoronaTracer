@@ -1,4 +1,4 @@
-export let positionsCorona = [
+let positionsCorona = [
     {
       title: '나의 위치',
       latlng: {lat: 37.56682, lng:126.97865}
