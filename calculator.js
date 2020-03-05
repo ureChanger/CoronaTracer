@@ -16,3 +16,13 @@ function coronaCalculator(latCorona, lngCorona, latUser, lngUser){
 
     return distance;
 }
+
+function calculateAndDisplayRoute(directionsService, directionsRenderer, ptsDict, transportation){
+    directionsService.route({
+        origin: ptsDict.origin,
+        destination: ptsDict.destination,
+        waypoints:ptsDict.waypts,
+        optimizeWaypoints: true,
+        travelMode: transportation
+    });
+}

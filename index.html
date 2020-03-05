@@ -40,19 +40,42 @@
   </head>
   <body>
     <div id="map"></div>
-    <script type="module" src="./data/coronaData.js"></script>
-    <script type="module" src="./calculator.js"></script>
-    <script type="module" src="./infoWindow.js"></script>
-    <script type="text/javascript">
+    <script>
       function initMap() {
-        //var coronaCalculator = require('./calculator');
-        //var createContent = require( './infoWindow');
+        var directionsService = new google.maps.DirectionsService;
+        var directionsRenderer = new google.maps.DirectionsRenderer;
 
         var uluru = {lat: 37.56682, lng: 126.97865};
         var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 15 ,
-        center: uluru
+          zoom: 15 ,
+          center: uluru
         });
+        directionsRenderer.setMap(map);
+
+        var ptsDict = {origin: {lat: 37.56682, lng:126.97465}, waypts:[
+          {location:{lat: 37.56682, lng:126.97865}, stopover =true},
+          {location:{lat: 37.56682, lng:126.97865}, stopover =true},
+          {location:{lat: 37.56682, lng:126.97865}, stopover =true},
+          {location:{lat: 37.56682, lng:126.97865}, stopover =true}]
+          , destination: {lat: 37.57682, lng:126.97965}};
+        var transportation = 'DRIVING';
+
+        // var countNum = 0;
+        // for(var key in positions[0].latlng){
+        //   if(i==0){
+        //     ptsDict[origin] = positions[0][key];
+        //   }
+        //   else if(i==positions[0].length-1){
+        //     ptsDict[destination] = positions[0][key];
+        //   }
+        //   else{
+        //     ptsDict.waypts.push(positions[0][key]);
+        //   }
+        //   countNum += 1;
+        // }
+
+        calculateAndDisplayRoute(directionsService, directionsRenderer, ptsDict, transportation)
+        //directionsService, directionsRenderer, ptsDict, transportation
 
         //기본 변수
         var userStatus = {good: ['안전', '아무도 다녀가지 않았어요 !'],  bad: ['경계', '확진자 분이 다녀간 길입니다!']};
@@ -81,7 +104,9 @@
             imageUser = "https://user-images.githubusercontent.com/56578913/75643291-e2925980-5c81-11ea-9ff1-abad584df634.png"
 
         //Marker 생성 및 표시
-        for(var i = 0; i < positions.length; i++){
+        var markerArray = []
+
+        for(var i = 1; i < positions.length; i++){
           var position = positions[i].latlng,
           title = positions[i].title,
           icon = i == 0 ? imageCorona : imageUser
@@ -89,8 +114,6 @@
 
           addMarker(position, title, icon, number);
         }
-
-        var marker = new Array();
 
         //원 표시
         var circle = new google.maps.Circle({
@@ -108,35 +131,37 @@
 
         //addMarker.js
         function addMarker(position, title, icon, number){
-            marker[number] = new google.maps.Marker({
+          var marker = new google.maps.Marker({
             position: position,
             map: map,
             title: title,
             icon: icon
-            });
+          });
 
-            //InfoWindow Content 설정
-            contentUser = createContent(currentUserStatus)
-            
-            //InfoWindow 생성
-            var infowindow = new google.maps.InfoWindow({
-                content: contentUser
-            });
+          //InfoWindow Content 설정
+          contentUser = createContent(currentUserStatus);
+          
+          //InfoWindow 생성
+          var infowindow = new google.maps.InfoWindow({
+              content: contentUser
+          });
 
-            marker.addListener('click', function() {
-                infowindow.open(map, marker[number]);
-            });
+          marker.addListener('click', function() {
+              infowindow.open(map, marker[number]);
+          });
         }
-
-        
       }
 
       //데이터
       //coronaData.js
       let positions = [
         {
-          title: '나의 위치',
-          latlng: {lat: 37.56682, lng:126.97865}
+          title: '11번째 확진자',
+          latlng: {'집':{lat: 37.56682, lng:126.97865},
+            '카페':{lat: 37.56682, lng:126.97865},
+            '병원':{lat: 37.56682, lng:126.97865},
+            '집':{lat: 37.56682, lng:126.97865}
+          }
         },
         {
           title: '1번째 환자', 
@@ -196,9 +221,19 @@
 
         return distance;
       }
+
+      function calculateAndDisplayRoute(directionsService, directionsRenderer, ptsDict, transportation){
+        directionsService.route({
+            origin: ptsDict.origin,
+            destination: ptsDict.destination,
+            waypoints:ptsDict.waypts,
+            optimizeWaypoints: true,
+            travelMode: transportation
+        });
+      }
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKq50sa8PzRLvZfUi3m4HYWJKX7AH7dS0&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCaotd13uGDa-b8WDoJBxBqiR2CeHCIMWQ&callback=initMap">
     </script>
   </body>
 </html>
