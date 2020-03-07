@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<head>
+<script type="text/javascript" src="http://lbiz.talkyple.com/API/lang/tpLangApi.js?clientId=사용자 인증키"></script>
+<script type="text/javascript">
+         var tmap = null;
+         window.onload = function(){
+                  var tmap = new tilo.maps("mapDiv", {
+                  point:new tilo.point(127.0103478, 37.4916236),// 지도 중심 좌표
+                  coordinate:"wgs84",// 지도 좌표계
+                  level:6,// 지도의 레벨 (확대,축소 상태)
+                  lang:"kr"
+                  });
+         };
+</script>
+</head>
+<body>
+    <div id="mapDiv" style="width:600px;height:400px;"></div>
+</body>
+</html>

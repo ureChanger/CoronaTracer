@@ -53,20 +53,33 @@
         directionsRenderer.setMap(map);
 
         var ptsDict = {
-          origin: positionsCorona[0].latlng[0].location, 
+          origin: google.maps.LatLng(positionsCorona[0].latlng[0].location.lat, positionsCorona[0].latlng[0].location.lng), 
           waypts: [{location: positionsCorona[0].latlng[1].location, stopover: true},
             {location: positionsCorona[0].latlng[2].location, stopover: true}],
-          destination: positionsCorona[0].latlng[3].location};
+          destination: google.maps.LatLng(positionsCorona[0].latlng[3].location.lat, positionsCorona[0].latlng[3].location.lng)};
           
         var transportation = 'DRIVING';
 
         function calculateAndDisplayRoute(directionsService, directionsRenderer, ptsDict, transportation){
           directionsService.route({
-              origin: ptsDict.origin,
-              destination: ptsDict.destination,
-              waypoints:ptsDict.waypts,
+              origin: {lat: 37.612124, lng:126.997693},
+              destination: {lat: 37.480170, lng:126.916038},
+              waypoints:[{
+                location: {lat: 37.565865, lng:126.976883},
+                stopover: true},
+                {
+                  location: {lat: 37.487672, lng:126.913185},
+                  stopover: true
+                }],
               optimizeWaypoints: true,
-              travelMode: 'DRIVING'
+              travelMode: 'TRANSIT'
+          }, function(response, status){
+            console.log('result : ');
+            console.log(status);
+            console.log(response);
+            if(status == 'OK'){
+              directionsRenderer.setDirections(response);
+            }
           });
         }
 
@@ -86,7 +99,7 @@
         var currentUserStatus;
 
         //User와 Corona 확진자와의 거리 계산 후 판정
-        for(var i = 1; i < positionsCorona.length; i ++){
+        for(var i = 0; i < positionsCorona.length; i ++){
         if (coronaCalculator(positionsCorona[i].latlng[0].location.lat, positionsCorona[i].latlng[0].location.lng, positionsCorona[0].latlng[0].location.lat, positionsCorona[0].latlng[0].location.lng) <= userDistance){
             currentUserStatus = userStatus.bad;
             break;
@@ -102,7 +115,7 @@
         //Marker 생성 및 표시
         var markerArray = []
 
-        for(var i = 1; i < positionsCorona.length; i++){
+        for(var i = 0; i < positionsCorona.length; i++){
           var position = positionsCorona[i].latlng[0].location,
           title = positionsCorona[i].title,
           icon = i == 0 ? imageCorona : imageUser
@@ -157,27 +170,6 @@
           {name: '카페', location:{lat: 37.59682, lng:126.97965}},
           {name: '병원', location:{lat: 37.58682, lng:126.97665}},
           {name: '집', location: {lat: 37.55682, lng:126.97565}}]
-        },
-        {
-          title: '12번째 확진자',
-          latlng: [{name:'집', location:{lat: 37.55982, lng:126.97965}},
-          {name: '카페', location:{lat: 37.56982, lng:126.97865}},
-          {name: '병원', location:{lat: 37.56282, lng:126.97865}},
-          {name: '집', location: {lat: 37.56482, lng:126.97865}}]
-        },
-        {
-          title: '18번째 확진자',
-          latlng: [{name:'집', location:{lat: 37.56682, lng:126.97865}},
-          {name: '카페', location:{lat: 37.56682, lng:126.97865}},
-          {name: '병원', location:{lat: 37.56682, lng:126.97865}},
-          {name: '집', location: {lat: 37.56682, lng:126.97865}}]
-        },
-        {
-          title: '20번째 확진자',
-          latlng: [{name:'집', location:{lat: 37.56682, lng:126.97865}},
-          {name: '카페', location:{lat: 37.56682, lng:126.97865}},
-          {name: '병원', location:{lat: 37.56682, lng:126.97865}},
-          {name: '집', location: {lat: 37.56682, lng:126.97865}}]
         }
       ];
 
