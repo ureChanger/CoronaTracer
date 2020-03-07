@@ -3,11 +3,11 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <title>코로나 와드</title>
-    <meta property="og:title" content="코로나 와드"/>
+    <title>코로나 트레이서</title>
+    <meta property="og:title" content="코로나 트레이서"/>
 	<meta property="og:type"  content="website"/>
 	<meta property="og:image" content="https://user-images.githubusercontent.com/56578913/75622338-55e48e80-5be2-11ea-9380-1cfc0dfa720a.png" />
-	<meta property="og:description" content="나의 안전을 확인하는 가장 쉬운 방법"/>
+	<meta property="og:description" content="확진자의 동선을 확인하는 가장 쉬운 방법"/>
 	<meta property="og:url" content="https://coronaward.neocities.org"/>
 	<link rel = "icon" href = "https://user-images.githubusercontent.com/56578913/75621888-97bf0600-5bdd-11ea-8022-0da3bb413497.png"
 		type = "image/x-icon"/>
@@ -40,12 +40,9 @@
   </head>
   <body>
     <div id="map"></div>
-    <script>
-      //import { positionsCorona } from "coronaData.js"
-
-      // This example displays a marker at the center of Australia.
-      // When the user clicks the marker, an info window opens.
-
+    <script type="module" src="./data/coronaData.js"></script>
+    <script type="module" src="./test.js"></script>
+    <script type="text/javascript">
       function initMap() {
         var uluru = {lat: 37.56682, lng: 126.97865};
         var map = new google.maps.Map(document.getElementById('map'), {
@@ -57,29 +54,6 @@
         var coronaStatus = ['병원에서 치료 중', '자가 격리 중', '사망'];
         var circleRadius = 1;
         var userDistance = 0.1;
-
-        var positions = [
-          {
-            title: '나의 위치',
-            latlng: {lat: 37.56682, lng:126.97865}
-          },
-          {
-            title: '1번째 환자', 
-            latlng: {lat: 37.56880, lng: 126.97860}
-          },
-          {
-            title: '2번째 환자', 
-            latlng: {lat: 37.56836, lng: 126.97477}
-          },
-          {
-            title: '3번째 환자', 
-            latlng: {lat: 37.56879, lng: 126.97940}
-          },
-          {
-            title: '4번째 환자',
-            latlng: {lat: 37.56893, lng: 126.97738}
-          }
-        ];
 
         var contentUser;
         var currentUserStatus;
@@ -98,10 +72,10 @@
         //InfoWindow Content 설정
         contentUser = createContent(currentUserStatus)
 
-        //InfoWindow 생성 및 표시
+        //InfoWindow 생성
         var infowindow = new google.maps.InfoWindow({
           content: contentUser
-        });        
+        });
 
         var imageCorona = "https://user-images.githubusercontent.com/56578913/75643096-318bbf00-5c81-11ea-868f-687ba0983415.png",
 		    imageUser = "https://user-images.githubusercontent.com/56578913/75643291-e2925980-5c81-11ea-9ff1-abad584df634.png"
